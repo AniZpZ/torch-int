@@ -12,6 +12,7 @@ from ..functional.quantization import (
     fake_quantize_activation_per_token_absmax,
 )
 
+# opt中 fc2, out: W8A8BFP32OFP32Linear, q, k, v: W8A8B8O8Linear, fc1: W8A8B8O8LinearReLU
 
 class W8A8B8O8Linear(torch.nn.Module):
     # For qkv_proj
@@ -47,7 +48,9 @@ class W8A8B8O8Linear(torch.nn.Module):
         int8_module = W8A8B8O8Linear(
             module.in_features, module.out_features)
         int8_weight, weight_scale = quantize_per_tensor_absmax(module.weight)
-        int8_bias, bias_scale = quantize_per_tensor_absmax(module.bias)
+        # int8_bias, bias_scale should be 0, 0.0
+        mockbias = torch.zeros((1, module.out_features), dtype=torch.int8, requires_grad=False)
+        int8_bias, bias_scale = quantize_per_tensor_absmax(mockbias)
         alpha = input_scale * weight_scale / output_scale
         beta = bias_scale / output_scale
         int8_module.weight = int8_weight
@@ -92,7 +95,8 @@ class W8A8B8O8LinearReLU(torch.nn.Module):
         int8_module = W8A8B8O8LinearReLU(
             module.in_features, module.out_features)
         int8_weight, weight_scale = quantize_per_tensor_absmax(module.weight)
-        int8_bias, bias_scale = quantize_per_tensor_absmax(module.bias)
+        mockbias = torch.zeros((1, module.out_features), dtype=torch.int8, requires_grad=False)
+        int8_bias, bias_scale = quantize_per_tensor_absmax(mockbias)
         alpha = input_scale * weight_scale / output_scale
         beta = bias_scale / output_scale
         int8_module.weight = int8_weight
@@ -163,9 +167,11 @@ class W8A8B32O32Linear(torch.nn.Module):
         int8_module = W8A8B32O32Linear(
             module.in_features, module.out_features)
         int8_weight, weight_scale = quantize_per_tensor_absmax(module.weight)
-        module.bias = module.bias.float()
-        bias_scale = module.bias.abs().max() / (2**31 - 1)
-        int32_bias = (module.bias / bias_scale).round().to(torch.int32)
+        mockbias = torch.zeros((1, module.out_features), dtype=torch.int32, requires_grad=False)
+        mockbias = mockbias.float()
+        # llama bias should be 0
+        bias_scale = mockbias.abs().max() / (2**31 - 1)
+        int32_bias = (mockbias / bias_scale).round().to(torch.int32)
         alpha = input_scale * weight_scale / output_scale
         beta = bias_scale / output_scale
         int8_module.weight = int8_weight
@@ -210,6 +216,7 @@ class W8A8BFP32OFP32Linear(torch.nn.Module):
         x_shape = x.shape
         x = x.view(-1, x_shape[-1])
         self.bias = self.bias.to(torch.float32)
+        # beta should be 1 ?
         y = linear_a8_w8_bfp32_ofp32(
             x, self.weight, self.bias, self.a.item(), 1)
         y = y.view(*x_shape[:-1], -1)
@@ -222,7 +229,8 @@ class W8A8BFP32OFP32Linear(torch.nn.Module):
         int8_weight, weight_scale = quantize_per_tensor_absmax(module.weight)
         alpha = input_scale * weight_scale
         int8_module.weight = int8_weight
-        int8_module.bias = module.bias.to(torch.float32)
+        mockbias = torch.zeros((1, module.out_features), dtype=torch.float, requires_grad=False)
+        int8_module.bias = mockbias.to(torch.float32)
         int8_module.a = alpha
         int8_module.input_scale = input_scale
         int8_module.weight_scale = weight_scale
