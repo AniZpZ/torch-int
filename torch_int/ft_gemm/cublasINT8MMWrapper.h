@@ -82,12 +82,12 @@ public:
 
  
 
-PYBIND11_MODULE(FTGEMM, m) {
-    pybind11::class_<cublasINT8MMWrapper>(m, "cublasINT8MMWrapper")
-        .def(pybind11::init<const cublasINT8MMWrapper&>())
-        .def(pybind11::init<cublasLtHandle_t, cudaStream_t, cublasAlgoMap*, std::mutex*, bool>())
-        .def(pybind11::init<cublasHandle_t, cublasLtHandle_t, cudaStream_t, cublasAlgoMap*, std::mutex*, bool>())
-        .def("cublasINT8MMWrapper",  (void (cublasINT8MMWrapper::*)(int*, int, int, int, int, int64_t, int64_t, int64_t, const int8_t*, const int8_t*)) &cublasINT8MMWrapper::Gemm)
-        .def("cublasINT8MMWrapper",  (void (cublasINT8MMWrapper::*)(int8_t*, int, int, int, int, int64_t, int64_t, int64_t, const float,const int8_t*, const int8_t*)) &cublasINT8MMWrapper::Gemm)
-        .def("getUseOrderCol322R4R4", &cublasINT8MMWrapper::getUseOrderCol322R4R4);
-}
+// PYBIND11_MODULE(FTGEMM, m) {
+//     pybind11::class_<cublasINT8MMWrapper>(m, "cublasINT8MMWrapper")
+//         .def(pybind11::init<const cublasINT8MMWrapper&>())
+//         .def(pybind11::init<cublasLtHandle_t, cudaStream_t, cublasAlgoMap*, std::mutex*, bool>())
+//         .def(pybind11::init<cublasHandle_t, cublasLtHandle_t, cudaStream_t, cublasAlgoMap*, std::mutex*, bool>())
+//         .def("cublasINT8MMWrapper",  (void (cublasINT8MMWrapper::*)(int*, int, int, int, int, int64_t, int64_t, int64_t, const int8_t*, const int8_t*)) &cublasINT8MMWrapper::Gemm)
+//         .def("cublasINT8MMWrapper",  (void (cublasINT8MMWrapper::*)(int8_t*, int, int, int, int, int64_t, int64_t, int64_t, const float,const int8_t*, const int8_t*)) &cublasINT8MMWrapper::Gemm)
+//         .def("getUseOrderCol322R4R4", &cublasINT8MMWrapper::getUseOrderCol322R4R4);
+// }

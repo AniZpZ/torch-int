@@ -13,12 +13,13 @@
 # limitations under the License.
 
 cmake_minimum_required(VERSION 3.8)
+# find_package(pybind11 REQUIRED)
 
 set(CUDA_INCLUDE_DIR "/usr/local/cuda/include" CACHE PATH "CUTLASS Header Library")
 set(PYBIND_INCLUDE_DIR "/usr/local/lib/python3.9/site-packages/pybind11/include" CACHE PATH "PYBIND Header Library")
-set(PYTHON_INCLUDE_DIR "/home/hadoop-djst-algoplat/.conda/envs/sq/include/python3.8" CACHE PATH "PYTHON Header Library")
+set(PYTHON_INCLUDE_DIR "/usr/local/include/python3.9" CACHE PATH "PYTHON Header Library")
+# set(PYBIND11_DIR "/usr/local/lib/python3.9/site-packages/pybind11")
 include_directories(${CUDA_INCLUDE_DIR} ${PYBIND_INCLUDE_DIR} ${PYTHON_INCLUDE_DIR})
-
 
 add_library(cuda_utils STATIC cuda_utils.cc)
 set_property(TARGET cuda_utils PROPERTY POSITION_INDEPENDENT_CODE  ON)
@@ -39,6 +40,10 @@ add_library(cublasINT8MMWrapper STATIC cublasINT8MMWrapper.cc)
 set_property(TARGET cublasINT8MMWrapper PROPERTY POSITION_INDEPENDENT_CODE  ON)
 set_property(TARGET cublasINT8MMWrapper PROPERTY CUDA_RESOLVE_DEVICE_SYMBOLS  ON)
 target_link_libraries(cublasINT8MMWrapper PUBLIC -lcublasLt -lcudart -lcurand -lcublas cublasAlgoMap cublasMMWrapper cuda_utils)
+
+add_subdirectory(pybind11)
+pybind11_add_module(ftgemm MODULE bindings.cpp)
+target_link_libraries(ftgemm PUBLIC -lcudart -lcublas -lcublaslt cublasINT8MMWrapper cublasAlgoMap cuda_utils)
 
 
 
