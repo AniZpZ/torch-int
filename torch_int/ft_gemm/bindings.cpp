@@ -5,7 +5,7 @@
 // #include "cuda_utils.h"
 #include <torch/extension.h>
 #include <cuda_runtime.h>
-#include <pybind11/pybind11.h>
+// #include <pybind11/pybind11.h>
 
 class FTGEMM {
 private:
@@ -41,13 +41,13 @@ torch::Tensor FTGEMM::linear_a8_w8_o32(torch::Tensor input,  // INT8
                          // float alpha,           // FP32
                          // float beta) {          // FP32
 ) {
-  auto m = input.size(0);
-  auto n = weight.size(0);
-  auto k = input.size(1);
-  auto device = input.device();
+  int m = input.size(0);
+  int n = weight.size(0);
+  int k = input.size(1);
+  torch::Device device = input.device();
 
   // Allocate memory for output matrix on GPU
-  auto out = torch::empty({m, n}, torch::kInt32).to(device);
+  torch::Tensor out = torch::empty({m, n}, torch::kInt32).to(device);
   // bias = bias.to(device).view({1, -1}).repeat({M, 1});
   // auto bias_ = torch::mul(bias, beta);
   // std::cout << bias_ << std::endl;
@@ -69,13 +69,13 @@ torch::Tensor FTGEMM::linear_a8_w8_o8(torch::Tensor input,  // INT8
                                       float alpha // FP32
                                       // float beta) {          // FP32
 ) {
-  auto m = input.size(0);
-  auto n = weight.size(0);
-  auto k = input.size(1);
-  auto device = input.device();
+  int m = input.size(0);
+  int n = weight.size(0);
+  int k = input.size(1);
+  torch::Device device = input.device();
 
   // Allocate memory for output matrix on GPU
-  auto out = torch::empty({m, n}, torch::kInt8).to(device);
+  torch::Tensor out = torch::empty({m, n}, torch::kInt8).to(device);
   // bias = bias.to(device).view({1, -1}).repeat({M, 1});
   // auto bias_ = torch::mul(bias, beta);
   // std::cout << bias_ << std::endl;
