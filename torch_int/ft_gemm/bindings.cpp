@@ -1,14 +1,15 @@
-#include "common.h"
+// #include "common.h"
+#include <torch/torch.h>
 #include "cublasAlgoMap.h"
 #include "cublasINT8MMWrapper.h"
-#include "cuda_utils.h"
+// #include "cuda_utils.h"
 #include <torch/extension.h>
 #include <cuda_runtime.h>
 #include <pybind11/pybind11.h>
 
 class FTGEMM {
 private:
-  cublasINT8MMWrapper int8_gemm_wrapper;
+  cublasINT8MMWrapper *int8_gemm_wrapper = nullptr;
 
 public:
   FTGEMM() {
@@ -25,17 +26,17 @@ public:
     cublasLtCreate(&cublaslt_handle);
 
     int8_gemm_wrapper =
-        cublasINT8MMWrapper(cublaslt_handle, stream, cublas_algo_map,
+        new cublasINT8MMWrapper(cublaslt_handle, stream, cublas_algo_map,
                             cublas_wrapper_mutex, use_ORDER_COL32_2R_4R4);
   };
 
   ~FTGEMM() {};
   torch::Tensor linear_a8_w8_o32(torch::Tensor input, torch::Tensor weight);
   torch::Tensor linear_a8_w8_o8(torch::Tensor input, torch::Tensor weight, float alpha);
-}
+};
 
 torch::Tensor FTGEMM::linear_a8_w8_o32(torch::Tensor input,  // INT8
-                         torch::Tensor weight, // INT8
+                         torch::Tensor weight // INT8
                          // torch::Tensor bias,    // INT32
                          // float alpha,           // FP32
                          // float beta) {          // FP32
@@ -57,7 +58,7 @@ torch::Tensor FTGEMM::linear_a8_w8_o32(torch::Tensor input,  // INT8
   int32_t *output_ptr = out.data_ptr<int32_t>();
   // int32_t *output_ptr = bias_ptr;
 
-  int8_gemm_wrapper->GEMM(output_ptr, 1, m, n, k, 0, 0, 0, input_ptr,
+  int8_gemm_wrapper->Gemm(output_ptr, 1, m, n, k, 0, 0, 0, input_ptr,
                           weight_ptr);
   return out;
 }
@@ -85,12 +86,12 @@ torch::Tensor FTGEMM::linear_a8_w8_o8(torch::Tensor input,  // INT8
   int8_t *output_ptr = out.data_ptr<int8_t>();
   // int32_t *output_ptr = bias_ptr;
 
-  int8_gemm_wrapper->GEMM(output_ptr, 1, m, n, k, 0, 0, 0, alpha, input_ptr,
+  int8_gemm_wrapper->Gemm(output_ptr, 1, m, n, k, 0, 0, 0, alpha, input_ptr,
                           weight_ptr);
   return out;
 }
 
-PYBIND11_MODULE(FTGEMM, m) {
+PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     pybind11::class_<FTGEMM>(m, "FTGEMM")
     .def(pybind11::init<>())
     .def("linear_a8_w8_o32", &FTGEMM::linear_a8_w8_o32)

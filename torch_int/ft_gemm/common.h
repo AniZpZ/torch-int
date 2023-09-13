@@ -6,6 +6,7 @@
 #include <cuda_fp16.h>
 #include <iostream>
 #include <torch/torch.h>
+#include <cublas_v2.h>
 
 inline void checkCudaStatus(cudaError_t status) {
     if (status != cudaSuccess) {

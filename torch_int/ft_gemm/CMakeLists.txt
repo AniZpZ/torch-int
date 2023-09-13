@@ -14,12 +14,19 @@
 
 cmake_minimum_required(VERSION 3.8)
 # find_package(pybind11 REQUIRED)
+find_package(CUDA REQUIRED)
+# find_package(Torch REQUIRED)
 
 set(CUDA_INCLUDE_DIR "/usr/local/cuda/include" CACHE PATH "CUTLASS Header Library")
-set(PYBIND_INCLUDE_DIR "/usr/local/lib/python3.9/site-packages/pybind11/include" CACHE PATH "PYBIND Header Library")
+# set(PYBIND_INCLUDE_DIR "/usr/local/lib/python3.9/site-packages/pybind11/include" CACHE PATH "PYBIND Header Library")
 set(PYTHON_INCLUDE_DIR "/usr/local/include/python3.9" CACHE PATH "PYTHON Header Library")
+set(TORCH_INCLUDE_DIR1 "/usr/local/lib/python3.9/site-packages/torch/include" CACHE PATH "Torch")
+set(TORCH_INCLUDE_DIR2 "/usr/local/lib/python3.9/site-packages/torch/include/torch/csrc/api/include" CACHE PATH "Torch")
 # set(PYBIND11_DIR "/usr/local/lib/python3.9/site-packages/pybind11")
-include_directories(${CUDA_INCLUDE_DIR} ${PYBIND_INCLUDE_DIR} ${PYTHON_INCLUDE_DIR})
+include_directories(${CUDA_INCLUDE_DIR} ${PYBIND_INCLUDE_DIR} ${PYTHON_INCLUDE_DIR} ${TORCH_INCLUDE_DIR1} ${TORCH_INCLUDE_DIR2})
+set(TORCH_LIBRARIES "/usr/local/lib/python3.9/site-packages/torch/lib")
+link_directories("/usr/local/cuda/lib64" "/usr/local/lib/python3.9/site-packages/torch/lib")
+set(PYTHON_EXECUTABLE "/usr/local/bin/python3")
 
 add_library(cuda_utils STATIC cuda_utils.cc)
 set_property(TARGET cuda_utils PROPERTY POSITION_INDEPENDENT_CODE  ON)
@@ -42,8 +49,12 @@ set_property(TARGET cublasINT8MMWrapper PROPERTY CUDA_RESOLVE_DEVICE_SYMBOLS  ON
 target_link_libraries(cublasINT8MMWrapper PUBLIC -lcublasLt -lcudart -lcurand -lcublas cublasAlgoMap cublasMMWrapper cuda_utils)
 
 add_subdirectory(pybind11)
+# add_library(ftgemm SHARED bindings.cpp common.h)
+# add_library(ftgemm SHARED bindings.cpp)
 pybind11_add_module(ftgemm MODULE bindings.cpp)
-target_link_libraries(ftgemm PUBLIC -lcudart -lcublas -lcublaslt cublasINT8MMWrapper cublasAlgoMap cuda_utils)
+# set_property(TARGET ftgemm PROPERTY POSITION_INDEPENDENT_CODE  ON)
+# set_property(TARGET ftgemm PROPERTY CUDA_RESOLVE_DEVICE_SYMBOLS  ON)
+target_link_libraries(ftgemm PUBLIC torch -lcudart -lcublas -lcublasLt cublasINT8MMWrapper cublasAlgoMap)
 
 
 
