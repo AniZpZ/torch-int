@@ -15,6 +15,7 @@
  */
 
 #include "cuda_utils.h"
+// #include "src/fastertransformer/layers/attention_layers/AttentionWeight.h"
 #include "cublasAlgoMap.h"
 #include "cublasMMWrapper.h"
 #include <cublasLt.h>
@@ -23,6 +24,7 @@
 #include <map>
 #include <mutex>
 #include <string>
+#include "pybind11/pybind11.h"
 
 #pragma once
  
