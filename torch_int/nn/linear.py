@@ -10,6 +10,7 @@ from ..functional.quantization import (
     quantize_weight_per_channel_absmax,
     fake_quantize_activation_per_tensor_absmax,
     fake_quantize_activation_per_token_absmax,
+    quantize_fused_tensor_absmax,
 )
 
 class W8A8B8O8Linear(torch.nn.Module):
@@ -288,7 +289,23 @@ class W8A8BFP32OFP32Linear(torch.nn.Module):
         int8_module.input_scale = input_scale
         int8_module.weight_scale = weight_scale
         return int8_module
-
+    
+    @staticmethod
+    def from_float_fuse(module: torch.nn.ModuleList, input_scale):
+        clayer = module[0]
+        int8_weights, weight_scale = quantize_fused_tensor_absmax(module)
+        alpha = input_scale * weight_scale
+        int8_module_list = []
+        for i in range(len(module)):
+            int8_module = W8A8BFP32OFP32Linear(
+                clayer.in_features, clayer.out_features)
+            int8_module.weight = int8_weights[i]
+            int8_module.a = alpha
+            int8_module.input_scale = input_scale
+            int8_module.weight_scale = weight_scale
+            int8_module_list.append(int8_module)
+        return int8_module_list
+    
 
 class W8A8BFP32OFP32LinearWithSFactor(torch.nn.Module):
     # For fc2 and out_proj
@@ -341,8 +358,6 @@ class W8A8BFP32OFP32LinearWithSFactor(torch.nn.Module):
         int8_weight, weight_scale = quantize_per_tensor_absmax(module.weight)
         alpha = input_scale * weight_scale
         int8_module.weight = int8_weight
-        mockbias = torch.zeros((1, module.out_features), dtype=torch.float, requires_grad=False)
-        int8_module.bias = mockbias.to(torch.float32)
         int8_module.a = alpha
         int8_module.inscale = torch.tensor(input_scale)
         return int8_module
