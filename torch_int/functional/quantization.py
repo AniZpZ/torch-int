@@ -17,7 +17,6 @@ def quantize_per_tensor_absmax(t):
 @torch.no_grad()
 def quantize_fused_tensor_absmax(t):
     scale = 0
-    print(f"t type: {type(t)}, len: {len(t)}")
     for linear in t:
         scale = max(linear.weight.abs().max() / 127, scale)
     weight_list = []
