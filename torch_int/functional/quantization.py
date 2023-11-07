@@ -13,6 +13,25 @@ def quantize_per_tensor_absmax(t):
     t_q = t.to(torch.int8)
     return t_q, scale
 
+# for weights with same shape to share a common scale
+@torch.no_grad()
+def quantize_fused_tensor_absmax(t):
+    scale = 0
+    for linear in t:
+        scale = max(linear.weight.abs().max() / 127, scale)
+    weight_list = []
+    for linear in t:
+        cweight = linear.weight
+        if not cweight.is_cuda:
+            # half rounding is not supported on CPU
+            cweight = cweight.float()
+        # use inplace operation to save memory
+        cweight.div_(scale).round_()
+        t_q = cweight.to(torch.int8)
+        weight_list.append(t_q)
+
+    return weight_list, scale
+
 @torch.no_grad()
 def quantize_weight_per_channel_absmax(w):
     # w: [out_channel, in_channel]
