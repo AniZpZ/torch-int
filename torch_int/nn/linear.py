@@ -20,8 +20,8 @@ class W8A8B8O8Linear(torch.nn.Module):
         self.in_features = in_features
         self.out_features = out_features
 
-        self.register_buffer('weight', torch.randint(-127, 127, (self.out_features,
-                                                                 self.in_features), dtype=torch.int8, requires_grad=False))
+        self.register_buffer('weight', torch.empty(self.out_features,
+                                                self.in_features, dtype=torch.int8, requires_grad=False))
         self.register_buffer('bias', torch.zeros(
             (1, self.out_features), dtype=torch.int8, requires_grad=False))
         self.register_buffer('a', torch.tensor(alpha))
@@ -65,8 +65,8 @@ class W8A8B8O8LinearWithSFactor(torch.nn.Module):
         self.in_features = in_features
         self.out_features = out_features
 
-        self.register_buffer('weight', torch.randint(-127, 127, (self.out_features,
-                                                                 self.in_features), dtype=torch.int8, requires_grad=False))
+        self.register_buffer('weight', torch.empty(self.out_features,
+                                                    self.in_features, dtype=torch.int8, requires_grad=False))
         self.register_buffer('bias', torch.zeros(
             (1, self.out_features), dtype=torch.int8, requires_grad=False))
         self.register_buffer('a', torch.tensor(alpha))
@@ -116,8 +116,8 @@ class W8A8B8O8LinearReLU(torch.nn.Module):
         self.in_features = in_features
         self.out_features = out_features
 
-        self.register_buffer('weight', torch.randint(-127, 127, (self.out_features,
-                                                                 self.in_features), dtype=torch.int8, requires_grad=False))
+        self.register_buffer('weight', torch.empty(self.out_features,
+                                                self.in_features, dtype=torch.int8, requires_grad=False))
         self.register_buffer('bias', torch.zeros(
             (1, self.out_features), dtype=torch.int8, requires_grad=False))
         self.register_buffer('a', torch.tensor(alpha))
@@ -162,8 +162,8 @@ class W8A8B32O32LinearWithoutScaling(torch.nn.Module):
         self.in_features = in_features
         self.out_features = out_features
 
-        self.register_buffer('weight', torch.randint(-127, 127, (self.out_features,
-                                                                 self.in_features), dtype=torch.int8, requires_grad=False))
+        self.register_buffer('weight', torch.empty(self.out_features,
+                                                self.in_features, dtype=torch.int8, requires_grad=False))
         self.register_buffer('bias', torch.zeros(
             (1, self.out_features), dtype=torch.int32, requires_grad=False))
 
@@ -189,8 +189,8 @@ class W8A8B32O32Linear(torch.nn.Module):
         self.in_features = in_features
         self.out_features = out_features
 
-        self.register_buffer('weight', torch.randint(-127, 127, (self.out_features,
-                                                                 self.in_features), dtype=torch.int8, requires_grad=False))
+        self.register_buffer('weight', torch.empty(self.out_features,
+                                                self.in_features, dtype=torch.int8, requires_grad=False))
         self.register_buffer('bias', torch.zeros(
             (1, self.out_features), dtype=torch.int32, requires_grad=False))
         self.register_buffer('a', torch.tensor(alpha))
@@ -247,8 +247,8 @@ class W8A8BFP32OFP32Linear(torch.nn.Module):
         self.in_features = in_features
         self.out_features = out_features
 
-        self.register_buffer('weight', torch.randint(-127, 127, (self.out_features,
-                                                                 self.in_features), dtype=torch.int8, requires_grad=False))
+        self.register_buffer('weight', torch.empty(self.out_features,
+                                                self.in_features, dtype=torch.int8, requires_grad=False))
         self.register_buffer('bias', torch.zeros(
             (1, self.out_features), dtype=torch.float32, requires_grad=False))
         self.register_buffer('a', torch.tensor(alpha))
@@ -315,8 +315,8 @@ class W8A8BFP32OFP32LinearWithSFactor(torch.nn.Module):
         self.in_features = in_features
         self.out_features = out_features
 
-        self.register_buffer('weight', torch.randint(-127, 127, (self.out_features,
-                                                                 self.in_features), dtype=torch.int8, requires_grad=False))
+        self.register_buffer('weight', torch.empty(self.out_features,
+                                                self.in_features, dtype=torch.int8, requires_grad=False))
         self.register_buffer('bias', torch.zeros(
             (1, self.out_features), dtype=torch.float32, requires_grad=False))
         self.register_buffer('a', torch.tensor(alpha))
@@ -369,8 +369,8 @@ class W8A16Linear(torch.nn.Module):
         self.in_features = in_features
         self.out_features = out_features
 
-        self.register_buffer('weight', torch.randint(-127, 127, (self.out_features,
-                                                                 self.in_features), dtype=torch.int8, requires_grad=False))
+        self.register_buffer('weight', torch.empty(self.out_features,
+                                                    self.in_features, dtype=torch.int8, requires_grad=False))
         if bias:
             self.register_buffer('bias', torch.zeros(
                 (1, self.out_features), dtype=torch.float16, requires_grad=False))
@@ -422,8 +422,8 @@ class W8FakeA8Linear(torch.nn.Module):
         self.in_features = in_features
         self.out_features = out_features
 
-        self.register_buffer('weight', torch.randint(-127, 127, (self.out_features,
-                                                                 self.in_features), dtype=torch.int8, requires_grad=False))
+        self.register_buffer('weight', torch.empty(self.out_features,
+                                                self.in_features, dtype=torch.int8, requires_grad=False))
         if bias:
             self.register_buffer('bias', torch.zeros(
                 (1, self.out_features), dtype=torch.float16, requires_grad=False))
